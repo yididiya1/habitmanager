@@ -2,34 +2,39 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
-import 'package:habitmanager1/Habit.dart';
-import 'package:habitmanager1/HabitLists.dart';
+import 'package:habitmanager1/entities/Habit.dart';
+import 'package:habitmanager1/util/dbhelper.dart';
 
-import 'CustomButton.dart';
-import 'main.dart';
+
+import '../widgets/CustomButton.dart';
+
 
 
 class AddHabitPage extends StatefulWidget {
+
+  Habit habit;
+  AddHabitPage(this.habit);
   @override
-  _AddHabitPageState createState() => _AddHabitPageState();
+  _AddHabitPageState createState() => _AddHabitPageState(this.habit);
 }
-
-
-
 Habit userhabit;
 Habit dd;
 
-
 class _AddHabitPageState extends State<AddHabitPage> {
 
- // GlobalKey<_HabitLists> _key = GlobalKey();
+  Habit habit;
+  DatabaseHelper databaseHelper = DatabaseHelper();
+  final TextEditingController habitNameController = new TextEditingController();
+  final TextEditingController habitDescriptionController = new TextEditingController();
+
+  _AddHabitPageState(this.habit);
+
 
   @override
   void initState(){
     super.initState();
-    userhabit = new Habit(habitName: 'mmm', habitDescription: 'dddd', numberOfDays: 30);
-    dd = new Habit(habitName: '12222', habitDescription: '122', numberOfDays: 33);
-  }
+    userhabit = new Habit(' ',' ',0);
+   }
 
 
   String dropdownValue = 'One';
@@ -77,7 +82,8 @@ class _AddHabitPageState extends State<AddHabitPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Scaffold( 
+    body:SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -100,23 +106,21 @@ class _AddHabitPageState extends State<AddHabitPage> {
                     width: 220,
                     height: 50,
                     child: TextField(
+                      
+                      controller: habitNameController,
+                      onChanged: (value) { updatehabitName();},
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(
                                 Radius.circular((12)))
                         ),
-                        labelText: 'Task Name',
+                        labelText: 'Habit Name',
                         labelStyle: TextStyle(
                           fontSize: 13,
                         ),
 
                       ),
-
-                      onSubmitted: (String s) {
-                        setState(() {
-                          userhabit.habitName = s;
-                        });
-                      },
+                     
 
                     ),
                   ),
@@ -153,7 +157,7 @@ class _AddHabitPageState extends State<AddHabitPage> {
                     },
                     onChangeEnd: (double d) {
                       setState(() {
-                        userhabit.numberOfDays = d.round();
+                        habit.numberOfDays = d.round();
                       });
                     },
                   ),
@@ -164,6 +168,7 @@ class _AddHabitPageState extends State<AddHabitPage> {
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: TextField(
+                      controller: habitDescriptionController,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.all(
@@ -175,11 +180,7 @@ class _AddHabitPageState extends State<AddHabitPage> {
                           )
                       ),
                       maxLines: 10,
-                      onChanged: (String s) {
-                        setState(() {
-                          userhabit.habitDescription = s;
-                        });
-                      },
+                      onChanged: (value) { updatehabitDescription(); },
                     ),
 
                   ),
@@ -307,7 +308,7 @@ class _AddHabitPageState extends State<AddHabitPage> {
           )
         ],
       ),
-    );
+    ));
   }
 
   Widget datetimePicker(IconData icon, VoidCallback onPressed, String value) {
@@ -465,10 +466,8 @@ class _AddHabitPageState extends State<AddHabitPage> {
         CustomButton(
           onPressed: () {
            // _key.currentState.setHabit(dd);
-            setState(() {
-
-            });
-            Navigator.of(context).pop();
+            _save();
+            
           },
           buttonText: 'Save',
           color: Theme
@@ -479,6 +478,50 @@ class _AddHabitPageState extends State<AddHabitPage> {
         ),
       ],
     );
+  }
+  void updatehabitName(){
+    habit.habitName= habitNameController.text;
+  }
+
+  //Update the description
+  void updatehabitDescription(){
+    habit.habitDescription = habitDescriptionController.text;
+  }
+
+  void moveToLastScreen(){
+    Navigator.pop(context,true);
+  }
+  
+
+  //save to database
+  void _save() async {
+
+    moveToLastScreen();
+
+    int result;
+    if(habit.id != null){
+      //case 1 : update operation
+      result = await databaseHelper.updateHabit(habit);
+    }else{ //insert operation
+      result = await databaseHelper.insertHabit(habit);
+    }
+
+    if(result != 0 ){
+      _showAlertDialog('Status', 'Habit Saved Successfully');
+      print('saved successfully');
+      print(habit.habitName);
+    }else{
+      _showAlertDialog('Status','Problem Saving Habit');
+      print('not saved');
+    }
+  }
+
+  void _showAlertDialog(String title,String message){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(title),
+      content:Text(message),
+    );
+    showDialog(context: context,builder:(_) => alertDialog);
   }
 }
 
