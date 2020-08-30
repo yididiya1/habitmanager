@@ -9,20 +9,21 @@ class Habit {
   String _reminders;
   DateTime _dayStarted;
   List<bool> _repetition;
-  String _dayscompleted;
-  String _daysuncompleted;
+  String _daysCompleted;
+  String _daysUncompleted;
 
 
   Habit(
     this._habitName,
     this._habitDescription,
     this._numberOfDays,
+    this._daysCompleted,
+    this._daysUncompleted,
     [this._numberOfDaysCompleted,
     this._dayStarted,
     this._reminders,
     this._repetition,
-    this._dayscompleted,
-    this._daysuncompleted,]
+   ]
   );
 
   Habit.withId(
@@ -30,12 +31,13 @@ class Habit {
     this._habitName,
     this._habitDescription,
     this._numberOfDays,
+    this._daysCompleted,
+    this._daysUncompleted,
     [this._numberOfDaysCompleted,
     this._dayStarted,
     this._reminders,
     this._repetition,
-    this._dayscompleted,
-    this._daysuncompleted,]
+   ]
   );
   
   //TODO dayscompleted to list of Dates 
@@ -46,6 +48,8 @@ class Habit {
   String get habitName => _habitName;
   String get habitDescription => _habitDescription;
   int get numberOfDays => _numberOfDays;
+  String get daysCompleted => _daysCompleted;
+  String get daysUncompleted => _daysUncompleted; 
   
 
   set habitName(String newhabitName){
@@ -53,10 +57,18 @@ class Habit {
         this._habitName = newhabitName;
     }
   }
+
   set habitDescription(String newhabitDescription){
     if(habitDescription.length <= 255){
         this._habitDescription = newhabitDescription;
     }
+  }
+  set daysCompleted(String newdaysCompleted){
+    this._daysCompleted = newdaysCompleted;
+  }
+  
+  set daysUncompleted(String newdaysUncompleted){
+    this._daysUncompleted = newdaysUncompleted;
   }
   set numberOfDays(int days){
     this._numberOfDays = days;
@@ -76,7 +88,8 @@ class Habit {
     map['habitName'] = _habitName;
     map['habitDescription'] = _habitDescription;
     map['numberOfDays'] = _numberOfDays;
-  
+    map['daysCompleted'] = _daysCompleted;
+    map['daysUncompleted'] = _daysUncompleted;
 
     return map;
   }
@@ -88,6 +101,8 @@ class Habit {
     this._habitName = map['habitName'];
     this._habitDescription = map['habitDescription'];
     this._numberOfDays = map['numberOfDays'];
+    this._daysCompleted=map['daysCompleted'];
+    this._daysUncompleted=map['daysUncompleted'];
   }
 
 }

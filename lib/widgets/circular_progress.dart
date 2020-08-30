@@ -6,20 +6,21 @@ import 'package:flutter/material.dart';
 class CircularProgress extends CustomPainter{
 
   double currentProgress;
+  Color currentColor;
 
-  CircularProgress(this.currentProgress);
+  CircularProgress(this.currentProgress,this.currentColor);
 
   @override
   void paint(Canvas canvas, Size size) {
 
     Paint outerCircle = Paint()
-        ..strokeWidth = 4
+        ..strokeWidth = 3.5
         ..style = PaintingStyle.stroke
         ..color = Colors.black;
 
     Paint completeArc = Paint()
         ..strokeWidth = 4
-        ..color = Colors.red
+        ..color = currentColor
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round;
 
