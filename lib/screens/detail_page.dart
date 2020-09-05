@@ -6,12 +6,9 @@ import '../entities/Habit.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-
-
-
 class DetailPage extends StatefulWidget {
 
-  Habit data;
+  final Habit data;
   DetailPage({this.data});
 
   @override
@@ -23,36 +20,33 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Habit> habitList;
   int count = 0;
-  //String dcomp = '2020-08-2 2020-08-3 2020-08-6 2020-08-4 2020-08-5';
-  //String duncomp;
-
   Habit data1;
   _DetailPage(this.data1);
 
-   Map<DateTime, List> _events = {};
-   Map<DateTime, List> _holidays = {};
-   
-   Map<DateTime, List> _events2 = {};
-   Map<DateTime, List> _holidays2 = {};
+  Map<DateTime, List> _events = {};
+  Map<DateTime, List> _holidays = {};
+ 
   List _selectedEvents;
+  
   AnimationController _animationController;
   CalendarController _calendarController;
 
   @override
   void initState() {
-    //data1.daysCompleted = '2020-08-2 2020-08-3 2020-08-6 2020-08-4 2020-08-5';
+   
     super.initState();
     initializeDateFormatting();
-    //updateListView();
-   addDatesComptolist(data1.daysCompleted);
-   addDatesUncomptolist(data1.daysUncompleted);
-    print(data1.daysCompleted);
+    
+    addDatesComptolist(data1.daysCompleted);
+    addDatesUncomptolist(data1.daysUncompleted);
+ 
+   
     final _selectedDay = DateTime.now();
 
     //_events = {};
     //_holidays = {};
 
-    _selectedEvents = _events[_selectedDay] ?? [];
+    //_selectedEvents = _events[_selectedDay] ?? [];
     _calendarController = CalendarController();
 
     _animationController = AnimationController(
@@ -61,8 +55,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
     );
 
     _animationController.forward();
-    _events2 = _events;
-    _holidays2 = _holidays;
+  
   }
 
   @override
@@ -87,13 +80,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
     print('CALLBACK: _onCalendarCreated');
   }
 
-   //TODO List<String> => List<DateTime>
-   List<DateTime> stringListToStringList(List<String> stringList){
-
-   }
-
-  //TODO Stringdate to List<Event>
-   void addDatesComptolist(String alldates){
+  Map<DateTime, List<dynamic>> addDatesComptolist(String alldates){
     List<String> dates = [];
     
     if(!(alldates==' ')){
@@ -104,11 +91,12 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
       _events[tempDate] = [' '];
     }
     }
-    return;
+    
     }
+    return _events;
   }
 
-   void addDatesUncomptolist(String alldates){
+    Map<DateTime, List<dynamic>> addDatesUncomptolist(String alldates){
     List<String> dates = [];
     
     if(!(alldates==' ')){
@@ -119,49 +107,32 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
       _holidays[tempDate] = [' '];
       }
     }
-    return;
+   
     }
+    return _holidays;
   }
 
-  //TODO get habit by data1.id
-
-  //TODO List<DateTime> => List<String>
-  //TODO List<String> => String
+  
   String listStringToString(List<String> list){
     list.removeWhere((v) => v == null);
     return list.join(" ");
   }
-  //TODO String => List<String> liststring = string.split(' ')
-  
-  void updateListView(){
-    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
-    dbFuture.then((database){
-      Future<List<Habit>> habitListFuture = databaseHelper.getHabitList();
-      habitListFuture.then((habitList) {
-        setState(() {
-          this.habitList = habitList;
-          this.count = habitList.length;
-          
-        });
-      });
-    });
-  }
-
-  void _delete(BuildContext context, Habit habit) async {
-    int result = await databaseHelper.deleteHabit(habit.id);
-    if(result != 0){
-      _showSnackBar(context,'Note Deleted Successfully');
-      updateListView();
-    }
-  }
+    
   void updatedaysCompleted(){
-    
     //data1.daysCompleted = dcomp;  
-    
-    
   }
   void updatedaysUncompleted(){
     //data1.daysUncompleted = duncomp;
+  }
+
+  void printEvents(Map x){
+    for(int i = 0;i<x.length;i++ ){
+      print('');
+    }
+  }
+
+  void printHoildays(){
+
   }
 
   void _showSnackBar(BuildContext context, String message){
@@ -350,7 +321,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
               Positioned(
                 right: 5,
                 bottom: 8,
-                child: _buildEventsMarker(date, events),
+                child: _buildEventsMarker(),
               ),
             );
           }
@@ -364,8 +335,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
               ),
             );
           }
-
-          return children;
+        return children;
         },
       ),
       onDaySelected: (date, events) {
@@ -378,50 +348,51 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
          var y =  DateFormat("yyyy-MM-dd").format(date) ;
           var x =  DateFormat("yyyy-MM-dd").format(date) + ' ';
           if((!data1.daysCompleted.contains(y) && !data1.daysUncompleted.contains(y))){
-              _events2[date]=[' '];
-              _holidays2.remove(date);
+             // _events2[date]=[' '];
+             // _holidays2.remove(date);
               setState(() {
-                //_events[date]=[' '];
-                _events = _events2;
-                _holidays = _holidays2;
+                _events[date]=[' '];
+                _holidays.remove(date);
+                //_events = _events2;
+                //_holidays = _holidays2;
                 data1.daysCompleted = data1.daysCompleted + ' '+ DateFormat("yyyy-MM-dd").format(date);
                 // _holidays.remove(date);
                  //_holidays[date] = [' '];
                  //data1.daysUncompleted = data1.daysUncompleted + ' '+ DateFormat("yyyy-MM-dd").format(date);
                  //data1.daysCompleted= data1.daysCompleted.replaceAll(x, '');
-                //addDatesComptolist(data1.daysCompleted);
-                //addDatesUncomptolist(data1.daysUncompleted);
+                // addDatesComptolist(data1.daysCompleted);
+                // addDatesUncomptolist(data1.daysUncompleted);
                 
                 // _save();
               });
               
             }else if(data1.daysCompleted.contains(y) && !data1.daysUncompleted.contains(y)){
              
-                _events2.remove(date);
-                _holidays2[date] = [' '];
+                // _events2.remove(date);
+                // _holidays2[date] = [' '];
                 setState(() {
-                  // _events.remove(date);
-                  // _holidays[date] = [' '];
-                  _events = _events2;
-                  _holidays = _holidays2;
+                  _events.remove(date);
+                  _holidays[date] = [' '];
+                  // _events = _events2;
+                  // _holidays = _holidays2;
                   //_holidays.remove(date);
                   //data1.daysUncompleted= data1.daysUncompleted.replaceAll(x, '');
                   data1.daysUncompleted = data1.daysUncompleted + ' '+ DateFormat("yyyy-MM-dd").format(date);
                   data1.daysCompleted= data1.daysCompleted.replaceAll(y, '');
                   // addDatesComptolist(data1.daysCompleted);
-                  //addDatesUncomptolist(data1.daysUncompleted);
+                  // addDatesUncomptolist(data1.daysUncompleted);
                   //_save();
                 });
                  
             }
             else if(!data1.daysCompleted.contains(y) && data1.daysUncompleted.contains(y) ){
-               _holidays2.remove(date);
-                _events2.remove(date);
+              //  _holidays2.remove(date);
+              //   _events2.remove(date);
               setState(() {
-                // _holidays.remove(date);
-                // _events.remove(date);
-                _events = _events2;
-                _holidays = _holidays2;
+                _holidays.remove(date);
+                _events.remove(date);
+                // _events = _events2;
+                // _holidays = _holidays2;
                 //data1.daysCompleted = data1.daysCompleted + ' '+ DateFormat("yyyy-MM-dd").format(date);
                 data1.daysUncompleted= data1.daysUncompleted.replaceAll(y, '');
                 data1.daysCompleted= data1.daysCompleted.replaceAll(y, '');
@@ -429,15 +400,14 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
                 //data1.daysCompleted = dcomp;
                 
                 //updatedaysCompleted();
-                //addDatestolist(data1.daysCompleted);
-                //addDatesComptolist(data1.daysCompleted);
+                // addDatesUncomptolist(data1.daysCompleted);
+                // addDatesComptolist(data1.daysCompleted);
                 //addDatesUncomptolist(data1.daysUncompleted);
                 //_save();
               });
                
             
             }
-           
       
       },
       onVisibleDaysChanged: _onVisibleDaysChanged,
@@ -445,7 +415,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
     );
   }
 
-  Widget _buildEventsMarker(DateTime date, List events) {
+  Widget _buildEventsMarker() {
     return Icon(
       Icons.check,
       size: 35.0,
