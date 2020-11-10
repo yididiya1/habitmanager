@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:habitmanager1/entities/Habit.dart';
 import 'package:habitmanager1/util/dbhelper.dart';
+import 'package:intl/intl.dart';
 
 
 import '../widgets/CustomButton.dart';
@@ -13,48 +14,45 @@ import '../widgets/CustomButton.dart';
 class AddHabitPage extends StatefulWidget {
 
   Habit habit;
-  AddHabitPage(this.habit);
+  String title;
+  AddHabitPage(this.habit,this.title);
   @override
-  _AddHabitPageState createState() => _AddHabitPageState(this.habit);
+  _AddHabitPageState createState() => _AddHabitPageState(this.habit,this.title);
 }
 Habit userhabit;
 Habit dd;
 
 class _AddHabitPageState extends State<AddHabitPage> {
 
+  
   Habit habit;
+  String title;
   DatabaseHelper databaseHelper = DatabaseHelper();
   final TextEditingController habitNameController = new TextEditingController();
   final TextEditingController habitDescriptionController = new TextEditingController();
 
-  _AddHabitPageState(this.habit);
+  _AddHabitPageState(this.habit,this.title);
 
 
   @override
   void initState(){
     super.initState();
-    userhabit = new Habit(' ',' ',0,' ',' ');
+    userhabit = new Habit(' ',' ',0,' ',' ',0,'','','','');
    }
-
-
-  String dropdownValue = 'One';
+   String weekDays ='';
+  Color colorr;
+  double bred = 0.0;double bgreen = 2.0;double byellow = 0.0;double borange= 0.0;double bblue= 0.0;
+  double bbrown=0.0;double bwhite=0.0; double bblack=0.0;double bpink=0.0;double bcyan =0.0;
+  double blime =0.0;double bpurple=0.0;
+  String dropdownValue = 'Daily';
   String droptimeValue = 'Once';
   double v = 5.00;
   String selectedDate = 'Pick a Date';
   String selectedTime = 'Pick a Time';
   String selectedTime2 = 'Pick a Time';
   String selectedTime3 = 'Pick a Time';
-  bool isselected = false;
-  bool istwice = false;
-  bool isthree = false;
-  bool isonce = true;
-  bool onmonday = true;
-  bool ontuesday = true;
-  bool onwend = true;
-  bool onthur = true;
-  bool onfriday = true;
-  bool onsat = true;
-  bool onsun = true;
+  bool isselected = false;bool istwice = false;bool isthree = false;bool isonce = true;bool onmonday = true;
+  bool ontuesday = true;bool onwend = true;bool onthur = true;bool onfriday = true;bool onsat = true;bool onsun = true;
 
   Future pickDate() async {
     DateTime datepick = await showDatePicker(context: context,
@@ -63,17 +61,45 @@ class _AddHabitPageState extends State<AddHabitPage> {
         lastDate: new DateTime.now().add(Duration(days: 365)));
     if (datepick != null) {
       setState(() {
-        selectedDate = datepick.toString();
-      });
+        selectedDate = DateFormat('EEE, MMM d, ''yyyy').format(datepick);
+        habit.dayStarted = selectedDate.toString();
+              });
     }
   }
 
   Future pickTime() async {
+    final now = new DateTime.now();
+    TimeOfDay timepick = await showTimePicker(
+        context: context, initialTime: TimeOfDay.fromDateTime(DateTime.now()));
+    if (timepick != null) {
+      setState(() {
+        DateTime time = new DateTime(now.year,now.month,now.day,timepick.hour,timepick.minute) ; 
+        selectedTime = DateFormat('hh:mm aaa').format(time);
+        habit.reminders=selectedTime.toString()+' ';
+      });
+    }
+  }
+   Future pickTime2() async {
+    final now = new DateTime.now();
     TimeOfDay timepick = await showTimePicker(
         context: context, initialTime: TimeOfDay.now());
     if (timepick != null) {
       setState(() {
-        selectedTime = timepick.toString();
+      DateTime time = new DateTime(now.year,now.month,now.day,timepick.hour,timepick.minute) ; 
+      selectedTime2 = DateFormat('hh:mm aaa').format(time);
+      habit.reminders+=selectedTime2.toString()+' ';
+      });
+    }
+  }
+  Future pickTime3() async {
+    final now = new DateTime.now();
+    TimeOfDay timepick = await showTimePicker(
+        context: context, initialTime: TimeOfDay.now());
+    if (timepick != null) {
+      setState(() {
+      DateTime time = new DateTime(now.year,now.month,now.day,timepick.hour,timepick.minute) ; 
+      selectedTime3 = DateFormat('hh:mm aaa').format(time);
+      habit.reminders+=selectedTime3.toString();
       });
     }
   }
@@ -85,7 +111,7 @@ class _AddHabitPageState extends State<AddHabitPage> {
     return Scaffold( 
     appBar: AppBar(
         leading: Icon(Icons.menu),
-        title: Text('Add Habit',style: TextStyle(fontFamily:'JosefinSans'),),
+        title: Text(title,style: TextStyle(fontFamily:'JosefinSans'),),
          actions: [
           Icon(Icons.favorite),
           Padding(
@@ -198,8 +224,9 @@ class _AddHabitPageState extends State<AddHabitPage> {
                         fontSize: 13,
                       )
                   ),
-                  maxLines: 10,
-                  onChanged: (value) { updatehabitDescription(); },
+                  //maxLines: 10,
+                  onSubmitted: (value) { updatehabitDescription(); },
+                  
                 ),
 
               ),
@@ -227,18 +254,18 @@ class _AddHabitPageState extends State<AddHabitPage> {
                       onChanged: (String newValue) {
                         setState(() {
                           dropdownValue = newValue;
-                          if (newValue == 'Three') {
+                          if (newValue == 'Custom') {
                             isselected = true;
                           }
-                          else if (newValue == 'One') {
+                          else if (newValue == 'Daily') {
                             isselected = false;
                           }
-                          else {
-                            isselected = false;
-                          }
+//                          else {
+//                            isselected = false;
+//                          }
                         });
                       },
-                      items: <String>['One', 'Two', 'Three'].map<
+                      items: <String>['Daily', 'Custom'].map<
                           DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -307,18 +334,311 @@ class _AddHabitPageState extends State<AddHabitPage> {
                 Icons.access_time, pickTime, selectedTime) : Container(
               width: 0, height: 0,),
             isthree ? Column(children: <Widget>[
-              datetimePicker(Icons.access_time, pickTime, selectedTime3),
-              datetimePicker(Icons.access_time, pickTime, selectedTime3),
-              datetimePicker(Icons.access_time, pickTime, selectedTime3)
+              datetimePicker(Icons.access_time, pickTime, selectedTime),
+              datetimePicker(Icons.access_time, pickTime2, selectedTime2),
+              datetimePicker(Icons.access_time, pickTime3, selectedTime3)
             ],) : Container(
               width: 0, height: 0,),
             istwice ? Column(children: <Widget>[
-              datetimePicker(Icons.access_time, pickTime, selectedTime2),
-              datetimePicker(Icons.access_time, pickTime, selectedTime2)
+              datetimePicker(Icons.access_time, pickTime, selectedTime),
+              datetimePicker(Icons.access_time, pickTime2, selectedTime2)
             ],) : Container(
               width: 0, height: 0,),
-
-            Padding(padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+            SizedBox(height:20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                  
+                   
+                  ),
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                      decoration: BoxDecoration(
+                        border:Border.all(width:bgreen, color: Colors.black54,),
+                         color: Color(0xFF4CAF50),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                     
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=2.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color =  Color(0xFF4CAF50).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                       decoration: BoxDecoration(
+                        border:Border.all(width:borange, color: Colors.black54,),
+                         color: Color(0xFFFF9800),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=2.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color = Color(0xFFFF9800).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                  
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                        decoration: BoxDecoration(
+                        border:Border.all(width:bred, color: Colors.black54,),
+                         color:  Color(0xFFF43030),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                      
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=2.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color = Color(0xFFF43030).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                  
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                      decoration: BoxDecoration(
+                        border:Border.all(width:byellow, color: Colors.black54,),
+                         color: Color(0xFFF4F130),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                        bblue = 0.0;bgreen=0.0;borange=0.0;byellow=2.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                        bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                        habit.color =  Color(0xFFF4E030).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                 
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                       decoration: BoxDecoration(
+                        border:Border.all(width:bblue, color: Colors.black54,),
+                         color: Color(0xFF3075F4),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 2.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color = Color(0xFF3075F4).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                 
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                     decoration: BoxDecoration(
+                        border:Border.all(width:bpurple, color: Colors.black54,),
+                         color:  Color(0xFFA621F3),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=2.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color = Color(0xFFA621F3).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 
+                
+              ],
+            ),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+              Container(
+                 
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                       decoration: BoxDecoration(
+                        border:Border.all(width:bpink, color: Colors.black54,),
+                         color: Color(0xFFE91E63),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=2.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color = Color(0xFFE91E63).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                  
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                      decoration: BoxDecoration(
+                        border:Border.all(width:bbrown, color: Colors.black54,),
+                         color: Color(0xFF795548),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=2.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color =  Color(0xFF795548).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                 
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                       decoration: BoxDecoration(
+                        border:Border.all(width:bwhite, color: Colors.black54,),
+                         color:  Color(0x5DFFFFFF),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=2.0;bblack=0.0;blime=0.0;bcyan=0.0;
+                         habit.color = Color(0x5DFFFFFF).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                 
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                       decoration: BoxDecoration(
+                        border:Border.all(width:bblack, color: Colors.black54,),
+                         color:  Color(0x73000000),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=2.0;blime=0.0;bcyan=0.0;
+                         habit.color =  Color(0x73000000).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                 
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                       decoration: BoxDecoration(
+                        border:Border.all(width:blime, color: Colors.black54,),
+                         color:  Color(0xFFCDDC39),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=2.0;bcyan=0.0;
+                         habit.color =   Color(0xFFCDDC39).value.toString();
+                      });
+                    }
+                  ),
+                ),
+                 Container(
+                 
+                  margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  width:30,
+                  height : 30,
+                  //color: Colors.green,
+                  child: GestureDetector(
+                    child:Container(
+                       decoration: BoxDecoration(
+                        border:Border.all(width:bcyan, color: Colors.black54,),
+                         color:  Color(0xFF00BCD4),
+                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                    ),
+                    onTap : (){
+                      setState((){
+                         bblue = 0.0;bgreen=0.0;borange=0.0;byellow=0.0;bred=0.0;bpurple=0.0;bpink=0.0;
+                         bbrown=0.0;bwhite=0.0;bblack=0.0;blime=0.0;bcyan=2.0;
+                         habit.color =  Color(0xFF00BCD4).value.toString();
+                      });
+                    }
+                  ),
+                ),
+            ],),
+            Padding(padding: EdgeInsets.fromLTRB(15, 20, 15, 0),
                 child: actionButton(context)),
             SizedBox(height: 20,)
           ],
@@ -496,6 +816,11 @@ class _AddHabitPageState extends State<AddHabitPage> {
       ],
     );
   }
+
+
+  
+
+
   void updatehabitName(){
     habit.habitName= habitNameController.text;
     //habit.daysUncompleted=' ';
@@ -514,7 +839,11 @@ class _AddHabitPageState extends State<AddHabitPage> {
     habit.daysCompleted ='2000-08-1';
     habit.daysUncompleted='2000-08-2';
   }
-  
+
+  void setWeekDays(){
+    habit.repetition = onmonday.toString() + ' ' + ontuesday.toString() + ' ' + onwend.toString() +' '+onthur.toString()+' '+onfriday.toString()+' '+onsat.toString()+' '+onsun.toString();
+  }
+
 
   //save to database
   void _save() async {
@@ -522,7 +851,7 @@ class _AddHabitPageState extends State<AddHabitPage> {
 
     fillforNow();
     moveToLastScreen();
-
+    setWeekDays();
 
 
     int result;

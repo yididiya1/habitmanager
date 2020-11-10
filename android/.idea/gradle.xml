@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -11,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_local_notifications-2.0.0+1/android" />
             <option value="C:/src/flutter/.pub-cache/hosted/pub.flutter-io.cn/path_provider-1.6.11/android" />
             <option value="C:/src/flutter/.pub-cache/hosted/pub.flutter-io.cn/path_provider_linux-0.0.1+2/android" />
             <option value="C:/src/flutter/.pub-cache/hosted/pub.flutter-io.cn/path_provider_macos-0.0.4+3/android" />

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habitmanager1/screens/homepage.dart';
+import 'package:habitmanager1/screens/homepage2.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
         fontFamily: 'JosefinSans',
       ),
-      home: MyHomePage(),
+      home: HomePage2(),
     );
   }
 }

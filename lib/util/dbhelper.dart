@@ -18,6 +18,11 @@ class DatabaseHelper{
   String colDays = 'numberOfDays';
   String colDaysCompleted = 'daysCompleted';
   String colDaysUncompleted = 'daysUncompleted';
+  String colReminders= 'reminders';
+  String colDayStarted ='dayStarted';
+  String colRepetition= 'repetition';
+  String colColor ='color';
+  String colNumberOfDaysCompleted = 'numberOfDaysCompleted';
 
 
   DatabaseHelper._createInstance(); //Named constructor to create instance of DatabaseHelper
@@ -52,7 +57,7 @@ class DatabaseHelper{
 
   void _createDB(Database db, int newVersion) async {
     
-    await db.execute('CREATE TABLE $habitTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colHabitName TEXT, $colHabitDescription TEXT, $colDays INTEGER, $colDaysCompleted TEXT, $colDaysUncompleted TEXT )');
+    await db.execute('CREATE TABLE $habitTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colHabitName TEXT, $colHabitDescription TEXT, $colDays INTEGER, $colDaysCompleted TEXT, $colDaysUncompleted TEXT , $colColor TEXT,$colReminders TEXT,$colRepetition TEXT,$colDayStarted TEXT,$colNumberOfDaysCompleted INTEGER)');
 
   }
 

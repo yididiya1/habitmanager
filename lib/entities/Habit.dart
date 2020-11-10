@@ -7,10 +7,11 @@ class Habit {
   int _numberOfDays;
   int _numberOfDaysCompleted;
   String _reminders;
-  DateTime _dayStarted;
-  List<bool> _repetition;
+  String _dayStarted;
+  String _repetition;
   String _daysCompleted;
   String _daysUncompleted;
+  String _color;
 
 
   Habit(
@@ -19,11 +20,12 @@ class Habit {
     this._numberOfDays,
     this._daysCompleted,
     this._daysUncompleted,
-    [this._numberOfDaysCompleted,
+    this._numberOfDaysCompleted,
     this._dayStarted,
     this._reminders,
     this._repetition,
-   ]
+    this._color,
+
   );
 
   Habit.withId(
@@ -33,11 +35,11 @@ class Habit {
     this._numberOfDays,
     this._daysCompleted,
     this._daysUncompleted,
-    [this._numberOfDaysCompleted,
+    this._numberOfDaysCompleted,
     this._dayStarted,
     this._reminders,
     this._repetition,
-   ]
+    this._color
   );
   
   //TODO dayscompleted to list of Dates 
@@ -49,7 +51,12 @@ class Habit {
   String get habitDescription => _habitDescription;
   int get numberOfDays => _numberOfDays;
   String get daysCompleted => _daysCompleted;
-  String get daysUncompleted => _daysUncompleted; 
+  String get daysUncompleted => _daysUncompleted;
+  String get repetition => _repetition;
+  String get color => _color;
+  String get reminders => _reminders;
+  String get dayStarted => _dayStarted;
+  int get numberOfDaysCompleted => _numberOfDaysCompleted;
   
 
   set habitName(String newhabitName){
@@ -73,8 +80,20 @@ class Habit {
   set numberOfDays(int days){
     this._numberOfDays = days;
   }
-  set id(int newId){
-    this._id = newId;
+  set color(String newColor){
+    this._color = newColor;
+  }
+  set numberOfDaysCompleted(int newNumOfDaysCompleted){
+    this._numberOfDaysCompleted = newNumOfDaysCompleted;
+  }
+  set repetition(String newrepetition){
+    this._repetition = newrepetition;
+  }
+  set reminders(String newreminders){
+    this._reminders = newreminders;
+  }
+  set dayStarted(String newdayStarted){
+    this._dayStarted = newdayStarted;
   }
 
   //Convert a Note Object into a Map Object
@@ -90,7 +109,12 @@ class Habit {
     map['numberOfDays'] = _numberOfDays;
     map['daysCompleted'] = _daysCompleted;
     map['daysUncompleted'] = _daysUncompleted;
-
+    map['numberOfDays'] = _numberOfDays;
+    map['color'] = _color;
+    map['numberOfDaysCompleted'] = _numberOfDaysCompleted;
+    map['repetition'] =  _repetition;
+    map['reminders'] = _reminders;
+    map['dayStarted'] =_dayStarted;
     return map;
   }
 
@@ -103,6 +127,12 @@ class Habit {
     this._numberOfDays = map['numberOfDays'];
     this._daysCompleted=map['daysCompleted'];
     this._daysUncompleted=map['daysUncompleted'];
+    this._numberOfDays=map['numberOfDays'];
+    this._color=map['color'];
+    this._numberOfDaysCompleted=map['numberOfDaysCompleted'];
+    this._repetition=map['repetition'];
+    this._reminders=map['reminders'];
+    this._dayStarted=map['dayStarted'];
   }
 
 }

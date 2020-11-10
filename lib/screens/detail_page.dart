@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import '../entities/Habit.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class DetailPage extends StatefulWidget {
 
@@ -25,6 +26,9 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
 
   Map<DateTime, List> _events = {};
   Map<DateTime, List> _holidays = {};
+
+   Map<DateTime, List> _events2 = {};
+  Map<DateTime, List> _holidays2 = {};
  
   List _selectedEvents;
   
@@ -43,8 +47,8 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
    
     final _selectedDay = DateTime.now();
 
-    //_events = {};
-    //_holidays = {};
+    // _events = addDatesComptolist(data1.daysCompleted ,_events2 );
+    // _holidays = addDatesUncomptolist(data1.daysUncompleted, _holidays2);
 
     //_selectedEvents = _events[_selectedDay] ?? [];
     _calendarController = CalendarController();
@@ -179,54 +183,199 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
     // addDatesComptolist(data1.daysCompleted);
     // addDatesUncomptolist(data1.daysUncompleted);
     return WillPopScope(
-          onWillPop: (){
+          onWillPop: ()async{
            
             moveToLastScreen();
             print('pop that ass up');
-           // return true;
+           return true;
           },
           child: Scaffold(
+        //resizeToAvoidBottomInset: false,
           appBar: AppBar(
+          elevation:0.0,
           leading: IconButton(
             icon:Icon(Icons.arrow_back),
             onPressed: (){
               //updatedaysCompleted();
               _save();
               //print('imma pop it up in');
-              print(data1.daysCompleted);
+             // print(data1.daysCompleted);
               moveToLastScreen();
             },
             ),
-          title: Text('Page title',style: TextStyle(fontFamily:'JosefinSans'),),
+          //title: Text('Page title',style: TextStyle(fontFamily:'JosefinSans'),),
            actions: [
-            Icon(Icons.favorite),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Icon(Icons.search),
-            ),
-            Icon(Icons.more_vert),
+              IconButton(
+              icon: Icon(Icons.more_vert,color: Colors.white,),
+              onPressed: (){},
+            )
+            //Icon(Icons.favorite),
+            // Padding(
+            //   padding: EdgeInsets.symmetric(horizontal: 16),
+            //   child: Icon(Icons.search),
+            // ),
+            // Icon(Icons.more_vert),
           ],
-          backgroundColor: Colors.purple,
+          backgroundColor:new Color(int.parse(data1.color)), 
         ),
-          body:Column(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            // Switch out 2 lines below to play with TableCalendar's settings
-            //-----------------------
-            Container(
+          body:SingleChildScrollView(
+                      child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              // Switch out 2 lines below to play with TableCalendar's settings
+              //-----------------------
+              Container(
+                height: 170,
+                decoration: BoxDecoration(
+                  color:new Color(int.parse(data1.color)),
 
-                child: _buildTableCalendarWithBuilders()),
-             //_buildTableCalendarWithBuilders(),
-            const SizedBox(height: 8.0),
-            //_buildButtons(),
-            Text(data1.daysCompleted.toString()),
-            Text('========================'),
-            Text(data1.daysUncompleted.toString()),
-            //Text(dcomp),
-            const SizedBox(height: 8.0),
-            //Expanded(child: _buildEventList()),
-          ],
+                ),
+                
+                
+                child: Column(
+                        children: <Widget>[
+                              // Container(
+                              //   padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                              //   child: Row(
+                              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //     children:<Widget>[
+                              //       IconButton(
+                              //         icon:Icon(Icons.arrow_back,color: Colors.white,),
+                              //         onPressed: (){
+                              //           _save();
+                              //           moveToLastScreen();
+                              //         },
+                              //       ),
+                              //       IconButton(
+                              //         icon: Icon(Icons.more_vert,color: Colors.white,),
+                              //         onPressed: (){},
+                              //       )
+                              //     ]
+
+                              //   ),
+                              
+                              // ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                        Container(
+                                          padding: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Container(
+                                                width: 200,
+                                                //height: 70,
+                                                child: Text(
+                                                  data1.habitName,
+                                                  style: TextStyle(
+                                                    fontSize: 35.0,
+                                                    color:Colors.white,
+                                                    fontWeight: FontWeight.bold
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height:0),
+                                              Container(
+                                                width: 200,
+                                                height: 70,
+                                                child: Text(
+                                                  data1.habitDescription,
+                                                  style: TextStyle(
+                                                    color:Colors.white70,
+                                                    fontSize: 16.0,
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                'Days Left : ${data1.numberOfDays - data1.numberOfDaysCompleted}',
+                                                style: TextStyle(
+                                                  color:Colors.white,
+                                                  fontSize:18,
+                                                  fontWeight:FontWeight.bold,
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+                                          
+                                        ),
+                                        Column(
+                                            children: <Widget>[
+                                                Container(
+                                                  margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                                  height: 100,
+                                                  width: 100,
+                                                  child: LiquidCircularProgressIndicator(
+                                                    value: (data1.numberOfDaysCompleted/data1.numberOfDays), // Defaults to 0.5.
+                                                    valueColor: AlwaysStoppedAnimation(Colors.white), // Defaults to the current Theme's accentColor.
+                                                    backgroundColor: new Color(int.parse(data1.color)), // Defaults to the current Theme's backgroundColor.
+                                                    borderColor: Colors.white,
+                                                    borderWidth: 5.0,
+                                                    direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
+                                                    center: Text("${((data1.numberOfDaysCompleted/data1.numberOfDays)*100).round()}%",style: TextStyle(color:Colors.black54,fontWeight: FontWeight.bold),),
+                                                  ),
+                                                ),SizedBox(height:10),
+                                                Container(
+                                                  margin: EdgeInsets.fromLTRB(12,0,0,0),
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Text(
+                                                          '${data1.numberOfDays}'
+                                                          ,style: TextStyle(
+                                                            fontSize: 30,
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                      ),
+                                                      Text('Days',style:TextStyle(color:Colors.white)),
+                                                    ],
+                                                  ),
+                                                ),
+                                            ],
+                                        ),
+                                        //SizedBox(height:10),
+                                        
+                                    ],
+                            ),
+                            
+                        ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(10, 20, 0, 10),
+                child: Text('Daily Status'
+                  ,style: TextStyle(
+                    fontSize:25,
+                    fontWeight:FontWeight.bold,
+                  ),
+                ),
+              ),
+              Container(
+                    child: _buildTableCalendarWithBuilders()
+              ),
+               //_buildTableCalendarWithBuilders(),
+              const SizedBox(height: 8.0),
+              //_buildButtons(),
+              Text(data1.daysCompleted.toString()),
+              Text('========================'),
+              Text(data1.daysUncompleted.toString()),
+              //Text(dcomp),
+              const SizedBox(height: 8.0),
+              Text(data1.color),
+              Text(data1.reminders),
+              Text(data1.repetition),
+              Text(data1.dayStarted),
+              Text(data1.numberOfDaysCompleted.toString()),
+              Text(data1.habitDescription),
+              Text(data1.habitName),
+              //Expanded(child: _buildEventList()),
+            ],
         ),
+          ),
       ),
     );
   }
@@ -250,7 +399,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
           borderRadius: BorderRadius.circular(16.0),
         ),
       ),
-      onDaySelected: _onDaySelected,
+      //onDaySelected: _onDaySelected,
       onVisibleDaysChanged: _onVisibleDaysChanged,
       onCalendarCreated: _onCalendarCreated,
     );
@@ -356,6 +505,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
                 //_events = _events2;
                 //_holidays = _holidays2;
                 data1.daysCompleted = data1.daysCompleted + ' '+ DateFormat("yyyy-MM-dd").format(date);
+                data1.numberOfDaysCompleted++;
                 // _holidays.remove(date);
                  //_holidays[date] = [' '];
                  //data1.daysUncompleted = data1.daysUncompleted + ' '+ DateFormat("yyyy-MM-dd").format(date);
@@ -379,6 +529,7 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
                   //data1.daysUncompleted= data1.daysUncompleted.replaceAll(x, '');
                   data1.daysUncompleted = data1.daysUncompleted + ' '+ DateFormat("yyyy-MM-dd").format(date);
                   data1.daysCompleted= data1.daysCompleted.replaceAll(y, '');
+                  data1.numberOfDaysCompleted--;
                   // addDatesComptolist(data1.daysCompleted);
                   // addDatesUncomptolist(data1.daysUncompleted);
                   //_save();
@@ -450,3 +601,8 @@ class _DetailPage extends State<DetailPage> with TickerProviderStateMixin{
 //String x = '2020-08-2 2020-08-3 2020-08-6 2020-08-4 2020-08-5';
 
 
+//convert reptitiions to list of days 
+//covert reminders to list of time 
+//UI finish 
+//Setting
+//import export
